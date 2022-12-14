@@ -1,0 +1,23 @@
+Erledigt:
+    Logger methode erstellt.
+    Container umgebung geschaffen.
+
+Must haves:
+    Commiten                 Fetig
+    Unit testing in Docker container (3)
+    Sequenzdiagramm/Classendiagramm erstellen
+
+    Console logging             Fetig
+    Log file                 Fetig
+    Schwellenwerte in einer Config setzen(json, ini,...)
+    Server logging loggen
+
+    Datenschutz doc erstellen
+
+
+Should have:
+    Drei Qualitätsicherungs maßnamen in der sequenz
+    Integrationstest automatisieren
+
+    Alarm dingens mit email und so (soft- hardlimits)
+    Argument -h for help
