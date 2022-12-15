@@ -6,6 +6,7 @@ capture stuff over time to calc an average
 """
 import json
 import sys
+import platform
 
 import psutil
 
@@ -43,6 +44,9 @@ def main() -> int:
         for i, (v, *_) in enumerate(psutil.disk_partitions()):
             temp = psutil.disk_usage(v)
 
+            if platform.platform().lower() == 'linux':
+                temp = psutil.disk_usage('/')
+
             stats['disc'].update({
                 i: {
                     'usage': temp.percent,
@@ -50,6 +54,11 @@ def main() -> int:
                     'used': float(f'{temp.used / 1000000000:.3f}')
                 }
             })
+
+            if platform.platform().lower() == 'linux':
+                break
+
+        print(stats)
 
         if stats['cpu'].get('usage') >= cpu_limits[1]:
             if stats['cpu'].get('usage') >= cpu_limits[0]:
