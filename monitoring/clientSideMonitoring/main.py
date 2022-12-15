@@ -44,7 +44,7 @@ def main() -> int:
         for i, (v, *_) in enumerate(psutil.disk_partitions()):
             temp = psutil.disk_usage(v)
 
-            if platform.platform().lower() == 'linux':
+            if 'linux' in platform.platform().lower():
                 temp = psutil.disk_usage('/')
 
             stats['disc'].update({
@@ -55,7 +55,7 @@ def main() -> int:
                 }
             })
 
-            if platform.platform().lower() == 'linux':
+            if 'linux' in platform.platform().lower():
                 break
 
         print(stats)
