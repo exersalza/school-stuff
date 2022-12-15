@@ -17,7 +17,7 @@ def main() -> int:
     while True:
         c: dict
 
-        with open('./config.json', 'r') as f:
+        with open('./config.json', 'r', encoding='utf-8') as f:
             c = json.load(f)
 
         logger = Logger(LogLevel.INFO, log_file='monitoring.log', api_url=c['api'])
