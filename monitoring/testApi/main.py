@@ -9,5 +9,5 @@ async def root():
 
 
 @app.get('/v1/burn/{_id}/{comp}')
-async def _comp(_id: int, comp: str, value: str = ''):
-    print(_id, comp, value)
+async def _comp(_id: int, comp: str, value: str = '', limit: str = ''):
+    print(_id, comp, value, limit)

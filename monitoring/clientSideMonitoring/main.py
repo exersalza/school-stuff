@@ -25,9 +25,15 @@ def main() -> int:
         # limits
         cpu_limits = (c['hard'].get('cpu', 95), c['hard'].get('cpu', 80))
         ram_limits = (c['hard'].get('ram', 90), c['hard'].get('ram', 80))
-        drive = (c['hard'].get('drive', 90), c['hard'].get('drive', 70))
+        drive_limits = (c['hard'].get('drive', 90), c['hard'].get('drive', 70))
 
-        cpu_usage = psutil.cpu_percent(interval=1)
+        # Timer is for flattening the Cpu graph output, prevent cpu performance spikes to send emails! :)
+        # the higher, the better, but 5 is a good value.
+
+        if c['timer'] <= 0:
+            raise ValueError('Timer can\'t be 0 or below')
+
+        cpu_usage = psutil.cpu_percent(interval=c['timer'])
         mem = psutil.virtual_memory()
 
         stats = {
@@ -58,18 +64,39 @@ def main() -> int:
             if 'linux' in platform.platform().lower():
                 break
 
-        print(stats)
+        cpu_usage = stats['cpu'].get('usage', 0)
+        ram_usage = stats['ram'].get('usage', 0)
 
-        if stats['cpu'].get('usage') >= cpu_limits[1]:
-            if stats['cpu'].get('usage') >= cpu_limits[0]:
+        if cpu_usage >= cpu_limits[1]:
+            if cpu_usage >= cpu_limits[0]:
                 logger.error('Cpu has exceeded its hard limits').get_api('burn/1337/cpu',
-                                                                         value=stats['cpu'].get('usage'), limit='hard')
+                                                                         value=cpu_usage, limit='hard')
                 continue
 
             logger.warning('Cpu has exceeded its soft limits').get_api('burn/1337/cpu',
-                                                                       value=stats['cpu'].get('usage'), limit='soft')
+                                                                       value=cpu_usage, limit='soft')
             continue
 
+        if ram_usage >= ram_limits[1]:
+            if ram_usage >= ram_limits[0]:
+                logger.error('Ram has exceeded its hard limits').get_api('burn/1337/ram',
+                                                                         value=ram_usage, limit='hard')
+                continue
+            logger.warning('Ram has exceeded its soft limits').get_api('burn/1337/ram',
+                                                                       value=ram_usage, limit='soft')
+            continue
+
+        for _, item in stats['disc'].items():
+            drive_usage = item['usage']
+
+            if drive_usage >= drive_limits[1]:
+                if drive_usage >= drive_limits[0]:
+                    logger.error('Drive has exceeded its hard limits').get_api('burn/1337/drive',
+                                                                               value=drive_usage, limit='hard')
+                    continue
+
+                logger.warning('Drive has exceeded its soft limits').get_api('burn/1337/drive',
+                                                                             value=ram_usage, limit='soft')
     return 0
 
 
