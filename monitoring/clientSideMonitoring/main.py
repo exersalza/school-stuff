@@ -1,3 +1,4 @@
+#!/bin/python3.11
 """
 
 capture stuff over time to calc an average
