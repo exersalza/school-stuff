@@ -70,20 +70,20 @@ def main() -> int:
         if cpu_usage >= cpu_limits[1]:
             if cpu_usage >= cpu_limits[0]:
                 logger.error('Cpu has exceeded its hard limits').get_api('burn/1337/cpu',
-                                                                         value=cpu_usage, limit='hard')
+                                                                         value=cpu_usage, hard=True)
                 continue
 
             logger.warning('Cpu has exceeded its soft limits').get_api('burn/1337/cpu',
-                                                                       value=cpu_usage, limit='soft')
+                                                                       value=cpu_usage)
             continue
 
         if ram_usage >= ram_limits[1]:
             if ram_usage >= ram_limits[0]:
                 logger.error('Ram has exceeded its hard limits').get_api('burn/1337/ram',
-                                                                         value=ram_usage, limit='hard')
+                                                                         value=ram_usage, hard=True)
                 continue
             logger.warning('Ram has exceeded its soft limits').get_api('burn/1337/ram',
-                                                                       value=ram_usage, limit='soft')
+                                                                       value=ram_usage)
             continue
 
         for _, item in stats['disc'].items():
@@ -92,11 +92,11 @@ def main() -> int:
             if drive_usage >= drive_limits[1]:
                 if drive_usage >= drive_limits[0]:
                     logger.error('Drive has exceeded its hard limits').get_api('burn/1337/drive',
-                                                                               value=drive_usage, limit='hard')
+                                                                               value=drive_usage, hard=True)
                     continue
 
                 logger.warning('Drive has exceeded its soft limits').get_api('burn/1337/drive',
-                                                                             value=ram_usage, limit='soft')
+                                                                             value=ram_usage)
     return 0
 
 
