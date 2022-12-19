@@ -4,8 +4,9 @@ let express = require('express');
 let app = express();
 
 app.get('/v1/burn/:id/:comp/:value/:hard', function (req, res) {
+    res.send({message: 'succeed'});
     if (Number(req.params.hard)) {
-        main("Hard limits Reached", req.params.value)
+        main("Hard limits Reached", req.params.value).catch((reason) => {console.log(reason)})
     }
     res.end();
 })

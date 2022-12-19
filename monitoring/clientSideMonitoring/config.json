@@ -1,13 +1,13 @@
 {
     "api": "http://127.0.0.1:8000/v1/",
-    "timer": 5,
+    "timer": 2,
     "hard": {
-        "cpu": 95,
+        "cpu": 1,
         "ram": 90,
         "drive": 90
     },
     "soft": {
-        "cpu": 70,
+        "cpu": 80,
         "ram": 80,
         "drive": 80
     }
