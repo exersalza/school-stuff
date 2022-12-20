@@ -61,11 +61,11 @@ def limit_check(limits: tuple, comp_usage: float, logger: Logger, comp_name: str
             res = logger.error(f'{comp_name.title()} has exceeded its hard limits') \
                 .get_api(f'burn/1337/{comp_name.lower()}/{comp_usage}/1')
 
-            return 0, res.status_code
+            return 0, res.status_code if not isinstance(res, int) else res
 
         res = logger.warning(f'{comp_name.title()} has exceeded its soft limits') \
             .get_api(f'burn/1337/{comp_name.lower()}/{comp_usage}/0')
 
-        return 0, res.status_code
+        return 0, res.status_code if not isinstance(res, int) else res
 
     return 1, 404

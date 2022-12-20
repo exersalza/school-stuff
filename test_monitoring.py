@@ -30,4 +30,4 @@ def test_limits():
 
 
 if __name__ == '__main__':
-    test_check_for_new_login()
+    test_limits()
