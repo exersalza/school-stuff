@@ -6,7 +6,7 @@ let app = express();
 app.get('/v1/burn/:id/:comp/:value/:hard', function (req, res) {
     res.send({message: 'succeed'});
     if (Number(req.params.hard)) {
-        main("Hard limits Reached", req.params.value).catch((reason) => {console.log(reason)})
+        main(`Hard limits reached`, `${req.params.comp} has exceeded it's limits. The ${req.params.comp} is currently at ${req.params.value}%. Ip: 127.0.0.1, Server id: ${req.params.id}`).catch((reason) => {console.log(reason)})
     }
     res.end();
 })

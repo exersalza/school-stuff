@@ -11,7 +11,7 @@ def is_linux() -> bool:
     return 'linux' in platform.platform().lower()
 
 
-def check_for_new_logins(last_login: bytes, logger: Logger, sub_res: Any) -> tuple:
+def check_for_new_logins(last_login: str, logger: Logger, sub_res: Any) -> tuple:
     """ Check for new logins inside coming over ssh
 
     :param last_login: The last cached login
@@ -20,16 +20,17 @@ def check_for_new_logins(last_login: bytes, logger: Logger, sub_res: Any) -> tup
     :return: tuple with the new 'last_login' and a status code
     """
 
-    if last_login != sub_res.stdout:
-        if last_login == b'':
-            last_login = sub_res.stdout
+    temp_last = sub_res.stdout.decode('utf-8').splitlines()[0]
+
+    if last_login != temp_last:
+        if last_login == '':
+            last_login = temp_last
             return last_login, 0
 
-        last_login = sub_res.stdout
-        logger.warning(f'New user login: {last_login}')
-        return last_login, 0
+        last_login = temp_last
+        logger.warning(f'New user event: {last_login}')
 
-    return b'Error', 1
+    return last_login, 0
 
 
 def get_limits(config: dict) -> tuple:
