@@ -1,7 +1,7 @@
 {
     "api": "http://127.0.0.1:8000/v1/",
-    "ssh_name": "julian",
-    "timer": 2,
+    "ssh_names": ["julian"],
+    "timer": 5,
     "hard": {
         "cpu": 95,
         "ram": 90,

@@ -15,8 +15,7 @@ from knxrcore.logger.logger import Logger, LogLevel
 from monitoring.clientSideMonitoring.utils import is_linux, check_for_new_logins, get_limits, limit_check
 
 __version__ = 'v1.23.4'
-update = subprocess.run('git -c "versionsort.suffix=-" ls-remote --tags --sort="v:refname" | awk "{print $2}"'.split(),
-                        check=True, capture_output=True).stdout
+update = __version__
 
 banner = f"""    __ __ _______   _________  __ ___    ____ 
    / //_// ____/ | / / ____/ |/ //   |  / __ \\
@@ -35,7 +34,8 @@ def main() -> int:
     print('-'*50)
     print(banner)
     print('-'*50)
-    return 0
+    print('Logging will start now...')
+
     while True:
         config: dict
 
@@ -43,6 +43,9 @@ def main() -> int:
             config = json.load(f)
 
         logger = Logger(LogLevel.INFO, log_file=f'{datetime.now().strftime("%Y-%d-%m")}.log', api_url=config['api'])
+        ssh_users = ''
+        for j in config['ssh_names']:
+            ssh_users += f'{j}|'
 
         # limits
         cpu_limits, drive_limits, ram_limits = get_limits(config)
@@ -97,7 +100,7 @@ def main() -> int:
 
         # New logins
         if is_linux():
-            sub_res = subprocess.run(f'last | grep "{config["ssh_name"]}" | head -n 1'.split(),
+            sub_res = subprocess.run(f'last | grep -E "{ssh_users[0:-1]}" | head -n 1'.split(),
                                      capture_output=True, check=True)
             last_login, *_ = check_for_new_logins(last_login, logger, sub_res)
 
