@@ -7,10 +7,11 @@ capture stuff over time to calc an average
 import json
 import subprocess
 import sys
-import psutil
-
-from knxrcore.logger.logger import Logger, LogLevel
 from datetime import datetime
+
+import psutil
+from knxrcore.logger.logger import Logger, LogLevel
+
 from monitoring.clientSideMonitoring.utils import is_linux, check_for_new_logins, get_limits, limit_check
 
 
