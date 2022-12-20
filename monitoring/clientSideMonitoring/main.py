@@ -7,10 +7,10 @@ capture stuff over time to calc an average
 import json
 import subprocess
 import sys
-
 import psutil
-from knxrcore.logger.logger import Logger, LogLevel
 
+from knxrcore.logger.logger import Logger, LogLevel
+from datetime import datetime
 from monitoring.clientSideMonitoring.utils import is_linux, check_for_new_logins, get_limits, limit_check
 
 
@@ -23,7 +23,7 @@ def main() -> int:
         with open('./config.json', 'r', encoding='utf-8') as f:
             config = json.load(f)
 
-        logger = Logger(LogLevel.INFO, log_file='monitoring.log', api_url=config['api'])
+        logger = Logger(LogLevel.INFO, log_file=f'{datetime.now().strftime("%Y-%d-%m")}.log', api_url=config['api'])
 
         # limits
         cpu_limits, drive_limits, ram_limits = get_limits(config)
