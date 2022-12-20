@@ -14,10 +14,28 @@ from knxrcore.logger.logger import Logger, LogLevel
 
 from monitoring.clientSideMonitoring.utils import is_linux, check_for_new_logins, get_limits, limit_check
 
+__version__ = 'v1.23.4'
+update = subprocess.run('git -c "versionsort.suffix=-" ls-remote --tags --sort="v:refname" | awk "{print $2}"'.split(),
+                        check=True, capture_output=True).stdout
+
+banner = f"""    __ __ _______   _________  __ ___    ____ 
+   / //_// ____/ | / / ____/ |/ //   |  / __ \\
+  / ,<  / __/ /  |/ / __/  |   // /| | / /_/ /
+ / /| |/ /___/ /|  / /___ /   |/ ___ |/ _, _/ 
+/_/ |_/_____/_/ |_/_____//_/|_/_/  |_/_/ |_|
+          Logging System {__version__}
+          latest server version {update}
+"""
+
 
 def main() -> int:
     last_login: bytes = b''
 
+    # start up sequence
+    print('-'*50)
+    print(banner)
+    print('-'*50)
+    return 0
     while True:
         config: dict
 

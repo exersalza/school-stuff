@@ -3,7 +3,7 @@
     "ssh_name": "julian",
     "timer": 2,
     "hard": {
-        "cpu": 1,
+        "cpu": 95,
         "ram": 90,
         "drive": 90
     },
