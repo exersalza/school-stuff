@@ -31,9 +31,9 @@ def main() -> int:
     last_login: bytes = b''
 
     # start up sequence
-    print('-'*50)
+    print('-' * 50)
     print(banner)
-    print('-'*50)
+    print('-' * 50)
     print('Logging will start now...')
 
     while True:
@@ -99,7 +99,7 @@ def main() -> int:
         # New logins
         if is_linux():
             sub_res = subprocess.run(f'last | grep "{ssh_user}" | head -n 1'.split(),
-                                    capture_output=True, check=True)
+                                     capture_output=True, check=True)
             last_login, *_ = check_for_new_logins(last_login, logger, sub_res)
 
     return 0
