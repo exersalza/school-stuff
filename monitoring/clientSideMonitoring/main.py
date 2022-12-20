@@ -5,35 +5,36 @@ capture stuff over time to calc an average
 
 """
 import json
+import subprocess
 import sys
-import platform
 
 import psutil
-
 from knxrcore.logger.logger import Logger, LogLevel
+
+from monitoring.clientSideMonitoring.utils import is_linux, check_for_new_logins, get_limits, limit_check
 
 
 def main() -> int:
+    last_login: bytes = b''
+
     while True:
-        c: dict
+        config: dict
 
         with open('./config.json', 'r', encoding='utf-8') as f:
-            c = json.load(f)
+            config = json.load(f)
 
-        logger = Logger(LogLevel.INFO, log_file='monitoring.log', api_url=c['api'])
+        logger = Logger(LogLevel.INFO, log_file='monitoring.log', api_url=config['api'])
 
         # limits
-        cpu_limits = (c['hard'].get('cpu', 95), c['hard'].get('cpu', 80))
-        ram_limits = (c['hard'].get('ram', 90), c['hard'].get('ram', 80))
-        drive_limits = (c['hard'].get('drive', 90), c['hard'].get('drive', 70))
+        cpu_limits, drive_limits, ram_limits = get_limits(config)
 
         # Timer is for flattening the Cpu graph output, prevent cpu performance spikes to send emails! :)
         # the higher, the better, but 5 is a good value.
 
-        if c['timer'] <= 0:
+        if config['timer'] <= 0:
             raise ValueError('Timer can\'t be 0 or below')
 
-        cpu_usage = psutil.cpu_percent(interval=c['timer'])
+        cpu_usage = psutil.cpu_percent(interval=config['timer'])
         mem = psutil.virtual_memory()
 
         stats = {
@@ -50,7 +51,7 @@ def main() -> int:
         for i, (v, *_) in enumerate(psutil.disk_partitions()):
             temp = psutil.disk_usage(v)
 
-            if 'linux' in platform.platform().lower():
+            if is_linux():
                 temp = psutil.disk_usage('/')
 
             stats['disc'].update({
@@ -61,36 +62,26 @@ def main() -> int:
                 }
             })
 
-            if 'linux' in platform.platform().lower():
+            if is_linux():
                 break
 
         cpu_usage = stats['cpu'].get('usage', 0)
         ram_usage = stats['ram'].get('usage', 0)
 
-        if cpu_usage >= cpu_limits[1]:
-            if cpu_usage >= cpu_limits[0]:
-                logger.error('Cpu has exceeded its hard limits').get_api(f'burn/1337/cpu/{cpu_usage}/1')
-                continue
-
-            logger.warning('Cpu has exceeded its soft limits').get_api(f'burn/1337/cpu/{cpu_usage}/0')
-            continue
-
-        if ram_usage >= ram_limits[1]:
-            if ram_usage >= ram_limits[0]:
-                logger.error('Ram has exceeded its hard limits').get_api(f'burn/1337/ram/{ram_usage}/1')
-                continue
-            logger.warning('Ram has exceeded its soft limits').get_api(f'burn/1337/ram/{ram_usage}/0')
-            continue
+        limit_check(cpu_limits, cpu_usage, logger, 'cpu')
+        limit_check(ram_limits, ram_usage, logger, 'ram')
 
         for _, item in stats['disc'].items():
             drive_usage = item['usage']
 
-            if drive_usage >= drive_limits[1]:
-                if drive_usage >= drive_limits[0]:
-                    logger.error('Drive has exceeded its hard limits').get_api(f'burn/1337/disc/{drive_usage}/1')
-                    continue
+            limit_check(drive_limits, drive_usage, logger, 'drive')
 
-                logger.warning('Drive has exceeded its soft limits').get_api(f'burn/1337/disc/{drive_usage}/0')
+        # New logins
+        if is_linux():
+            sub_res = subprocess.run(f'last | grep "{config["ssh_name"]}" | head -n 1'.split(),
+                                     capture_output=True, check=True)
+            last_login, *_ = check_for_new_logins(last_login, logger, sub_res)
+
     return 0
 
 
